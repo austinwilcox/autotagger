@@ -1,0 +1,14 @@
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+*.egg-info/
+dist/
+build/
+report.json
+
+# Plan working files
+autotagger.plan.json
+*.plan.json
+*.plan.json.artwork/
+*.json.artwork/

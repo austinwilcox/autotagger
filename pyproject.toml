@@ -1,0 +1,28 @@
+[project]
+name = "autotagger"
+version = "0.1.0"
+description = "Opinionated music file tagger: Apple/iTunes metadata + artwork, deterministic matching, optional local-LLM disambiguation."
+requires-python = ">=3.10"
+dependencies = [
+    "mutagen>=1.47",
+    "httpx>=0.27",
+    "rapidfuzz>=3.9",
+    "rich>=13.7",
+    "platformdirs>=4.2",
+]
+
+[project.scripts]
+autotagger = "autotagger.cli:main"
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["autotagger"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
