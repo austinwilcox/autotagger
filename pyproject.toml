@@ -3,6 +3,17 @@ name = "autotagger"
 version = "0.1.0"
 description = "Opinionated music file tagger: Apple/iTunes metadata + artwork, deterministic matching, optional local-LLM disambiguation."
 requires-python = ">=3.10"
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "Austin Wilcox" }]
+keywords = ["music", "metadata", "tagging", "id3", "album-art", "itunes", "deezer", "llm"]
+classifiers = [
+    "Environment :: Console",
+    "Intended Audience :: End Users/Desktop",
+    "Programming Language :: Python :: 3",
+    "Topic :: Multimedia :: Sound/Audio",
+]
 dependencies = [
     "mutagen>=1.47",
     "httpx>=0.27",
@@ -11,11 +22,17 @@ dependencies = [
     "platformdirs>=4.2",
 ]
 
+[project.urls]
+Homepage = "https://github.com/austinwilcox/autotagger"
+Issues = "https://github.com/austinwilcox/autotagger/issues"
+
 [project.scripts]
 autotagger = "autotagger.cli:main"
 
 [project.optional-dependencies]
-dev = ["pytest>=8.0"]
+# Artwork downscaling. Without it, covers are embedded at source resolution.
+artwork = ["pillow>=10.0"]
+dev = ["pytest>=8.0", "pyflakes>=3.0"]
 
 [build-system]
 requires = ["hatchling"]

@@ -375,7 +375,7 @@ Install it as a command you can run from anywhere:
 
 ```bash
 cd ~/Software/autoTagger
-uv tool install --editable --with pillow .
+uv tool install --editable '.[artwork]'
 
 autotagger doctor                # check everything is wired up
 ```
@@ -387,9 +387,11 @@ For development (running the test suite against a local venv):
 
 ```bash
 uv venv --python 3.12
-uv pip install -e ".[dev]" pillow
+uv pip install -e ".[dev,artwork]"
 .venv/bin/python -m pytest -q
 ```
+
+`uv.lock` is committed, so `uv sync` reproduces the exact dependency set.
 
 Optional acoustic fingerprinting — the strongest signal available, because it
 listens to the audio instead of reading what someone typed about it:
@@ -538,3 +540,7 @@ header parsing, and LLM output extraction. `tests/test_audio_roundtrip.py`
 synthesizes a file per container with ffmpeg and round-trips every tag through
 it — the per-format writer bugs are the ones that unit tests of the matcher
 would never catch.
+
+## License
+
+MIT — see [LICENSE](LICENSE).
