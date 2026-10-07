@@ -74,3 +74,17 @@ def test_strip_packaging_removes_release_noise_only():
     assert strip_packaging("About a Girl (Live)") == "About a Girl (Live)"
     assert strip_packaging("Stronger (feat. Kanye West)") == "Stronger (feat. Kanye West)"
     assert strip_packaging("DAMN.") == "DAMN."
+
+
+def test_strip_search_noise_drops_label_and_scene_brackets():
+    from autotagger.normalize import strip_search_noise
+
+    # A label suffix no word list can recognize, but fatal to a search.
+    assert strip_search_noise("Rush [NCS Release]") == "Rush"
+    assert strip_search_noise("Gone [Monstercat Release]") == "Gone"
+    # Parentheses carry identity and are left alone.
+    assert strip_search_noise("Stronger (feat. Kanye West)") == "Stronger (feat. Kanye West)"
+    assert strip_search_noise("About a Girl (Live)") == "About a Girl (Live)"
+    # Never reduce a title to nothing.
+    assert strip_search_noise("[NCS Release]") == "[NCS Release]"
+    assert strip_search_noise(None) is None
