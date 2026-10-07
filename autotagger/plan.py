@@ -246,6 +246,9 @@ class PlanError(Exception):
 
 _INT_FIELDS = {"track_number", "track_total", "disc_number", "disc_total"}
 _BOOL_FIELDS = {"compilation", "explicit"}
+# Written as several tag values rather than one joined string under the default
+# --artist-style list, so a list here is correct output, not a hand-edit mistake.
+_LIST_FIELDS = {"artist"}
 
 
 def validate(plan: "Plan") -> list[str]:
@@ -278,6 +281,12 @@ def validate(plan: "Plan") -> list[str]:
                 if not isinstance(value, bool):
                     problems.append(
                         f"{where}: {field_name} must be true or false, got {value!r}"
+                    )
+            elif field_name in _LIST_FIELDS and isinstance(value, list):
+                if not value or not all(isinstance(v, str) and v.strip() for v in value):
+                    problems.append(
+                        f"{where}: {field_name} as a list must hold non-empty text values, "
+                        f"got {value!r}"
                     )
             elif not isinstance(value, (str, int, float)):
                 problems.append(
