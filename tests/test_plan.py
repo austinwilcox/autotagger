@@ -246,3 +246,24 @@ def test_plan_is_idempotent_after_apply(tmp_path: Path):
     assert after.isrc == "GBDUW0000053"
     assert after.copyright == "(C) 2000"
     assert after.compilation is True
+
+
+def test_validate_accepts_multi_value_artist(tmp_path):
+    """--artist-style list writes several artist values; that is not a bad edit."""
+    from autotagger.plan import Plan, PlanEntry, validate
+
+    entry = PlanEntry(
+        path=tmp_path / "song.mp3",
+        fingerprint="x",
+        changes={"artist": ["Facading", "Holly Terrens", "Jagsy"]},
+    )
+    assert validate(Plan(entries=[entry])) == []
+
+    # A list of the wrong shape is still a problem, and still names the field.
+    bad = PlanEntry(path=tmp_path / "song.mp3", fingerprint="x", changes={"artist": ["", "  "]})
+    problems = validate(Plan(entries=[bad]))
+    assert len(problems) == 1 and "artist" in problems[0]
+
+    # Lists remain invalid for single-valued fields.
+    album = PlanEntry(path=tmp_path / "song.mp3", fingerprint="x", changes={"album": ["A", "B"]})
+    assert "album" in validate(Plan(entries=[album]))[0]

@@ -45,3 +45,28 @@ def test_artist_dash_album_single_folder():
 def test_generic_folders_are_not_treated_as_artists():
     af = parse("/Users/me/Music/song.mp3")
     assert af.guessed_artist is None
+
+
+def test_search_terms_include_a_debracketed_variant(tmp_path):
+    """A label suffix in the tag must not be the only thing we ever search for."""
+    from autotagger.models import AudioFile
+
+    af = AudioFile(path=tmp_path / "iFeature - Rush [NCS Release].mp3", ext=".mp3")
+    af.title = "Rush [NCS Release]"
+    af.artist = "iFeature"
+    terms = af.search_terms()
+    assert terms[0] == "iFeature Rush [NCS Release]"   # literal tag still tried first
+    assert "iFeature Rush" in terms                     # the query that actually hits
+    assert "Rush" in terms
+
+
+def test_search_terms_unchanged_when_nothing_to_strip(tmp_path):
+    from autotagger.models import AudioFile
+
+    af = AudioFile(path=tmp_path / "Oasis - Wonderwall.mp3", ext=".mp3")
+    af.title = "Wonderwall"
+    af.artist = "Oasis"
+    terms = af.search_terms()
+    # Nothing bracketed to strip, so no extra variant is added.
+    assert terms[:2] == ["Oasis Wonderwall", "Wonderwall"]
+    assert len(terms) == len(set(terms))

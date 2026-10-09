@@ -320,3 +320,29 @@ def join_credit(artists: list[str]) -> str:
     if len(names) == 1:
         return names[0]
     return f"{', '.join(names[:-1])} & {names[-1]}"
+
+
+# --- Search-term cleanup ---------------------------------------------------
+
+_SQUARE_GROUP = re.compile(r"\s*\[[^\]]*\]\s*")
+
+
+def strip_search_noise(text: str | None) -> str | None:
+    """Drop square-bracketed groups from text that will be used as a SEARCH TERM.
+
+    Distinct from `strip_packaging()`, which cleans text destined for a tag and
+    so only removes groups it recognizes as packaging. A label or scene suffix
+    is not recognizable from a word list — "[NCS Release]", "[Monstercat
+    Release]", "[Free DL]" — but it is reliably fatal to a catalogue search:
+    iTunes returns nothing at all for "iFeature Rush [NCS Release]".
+
+    Square brackets specifically, because the conventions differ: identity-
+    bearing markers ("(Live)", "(feat. X)", "(Radio Edit)") are written in
+    parentheses, while square brackets carry release and source annotations.
+    The caller keeps the original term and tries this as an extra one, so a
+    bracket that did carry identity costs nothing.
+    """
+    if not text:
+        return text
+    out = _SQUARE_GROUP.sub(" ", text)
+    return _WS.sub(" ", out).strip(" -–—") or text

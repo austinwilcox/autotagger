@@ -6,6 +6,8 @@ from dataclasses import dataclass, field, asdict
 from pathlib import Path
 from typing import Any
 
+from .normalize import strip_search_noise
+
 
 @dataclass
 class AudioFile:
@@ -83,12 +85,20 @@ class AudioFile:
         t, a, al = self.best_title, self.best_artist, self.best_album
         if t and a:
             terms.append(f"{a} {t}")
+        # A label or scene suffix in the title is fatal to a catalogue search —
+        # iTunes returns nothing at all for "iFeature Rush [NCS Release]" — so a
+        # de-bracketed variant is tried early, right after the literal one.
+        t_clean, a_clean = strip_search_noise(t), strip_search_noise(a)
+        if t_clean and a_clean and (t_clean, a_clean) != (t, a):
+            terms.append(f"{a_clean} {t_clean}")
         if t and a and al:
             terms.append(f"{a} {al} {t}")
         if t and al and not a:
             terms.append(f"{al} {t}")
         if t:
             terms.append(t)
+        if t_clean and t_clean != t:
+            terms.append(t_clean)
         if a and al:
             terms.append(f"{a} {al}")
         # Last resort: the raw filename stem, minus a leading track number.
